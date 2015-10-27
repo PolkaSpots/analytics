@@ -67,36 +67,42 @@ func main() {
 		tabr.ProjectId = *bqDestProject
 		tabr.TableId = "temp_grouped_v2"
 
-		jcq := new(bigquery.JobConfigurationQuery)
-		jcq.DestinationTable = tabr
-		jcq.Priority = "BATCH"
-		jcq.WriteDisposition = "WRITE_TRUNCATE"
-		jcq.Query = "SELECT ap_mac, COUNT(DISTINCT(client_mac)), DATE(TIMESTAMP(first_seen)) date FROM [dev_sense_v1.sensev4_ct] GROUP BY ap_mac, date"
+		// jcq := new(bigquery.JobConfigurationQuery)
+		// jcq.DestinationTable = tabr
+		// jcq.Priority = "BATCH"
+		// jcq.WriteDisposition = "WRITE_TRUNCATE"
+		// jcq.Query = "SELECT ap_mac, COUNT(DISTINCT(client_mac)), DATE(TIMESTAMP(first_seen)) date FROM [dev_sense_v1.sensev4_ct] GROUP BY ap_mac, date"
 
-		jc := new(bigquery.JobConfiguration)
-		jc.Query = jcq
+		// jc := new(bigquery.JobConfiguration)
+		// jc.Query = jcq
 
-		job := new(bigquery.Job)
-		job.Configuration = jc
+		// job := new(bigquery.Job)
+		// job.Configuration = jc
 
-		aa, err := bq.Jobs.Insert(*bqSourceProject, job).Do()
+		// aa, err := bq.Jobs.Insert(*bqSourceProject, job).Do()
+		// if err == nil {
+		// 	fmt.Print(aa.Id)
+		// } else {
+		// 	fmt.Print(err)
+		// }
+
+		jce := new(bigquery.JobConfigurationExtract)
+		jce.DestinationFormat = "csv"
+		jce.DestinationUri = "gs://ct_temp/151028.csv"
+		jce.SourceTable = tabr
+
+		extractJc := new(bigquery.JobConfiguration)
+		extractJc.Extract = jce
+		extractJob := new(bigquery.Job)
+		extractJob.Configuration = extractJc
+
+		aa, err := bq.Jobs.Insert(*bqSourceProject, extractJob).Do()
 		if err == nil {
 			fmt.Print(aa.Id)
 		} else {
 			fmt.Print(err)
 		}
-		// call = bq.JobConfiguration()
-		// colls := bq.Tabledata.List("", "", "")
 
-		// colls.MaxResults(10)
-		// list, _ := colls.Do()
-		// buf, _ = json.Marshal(list)
-		// fmt.Println(string(buf))
-		// b := resp.Rows
-		// for _, d := range b {
-		// 	fmt.Print(d.F)
-
-		// }
 	}
 
 }
